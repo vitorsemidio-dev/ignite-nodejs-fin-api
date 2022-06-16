@@ -53,7 +53,7 @@ app.post("/account", (req, res) => {
   return res.status(201).send();
 });
 
-app.get("/statement/", verifyIfExistsAccountCPF, (req, res) => {
+app.get("/statement", verifyIfExistsAccountCPF, (req, res) => {
   const { customer } = req;
 
   return res.json(customer.statement);
@@ -94,6 +94,21 @@ app.post("/withdraw", verifyIfExistsAccountCPF, (req, res) => {
   customer.statement.push(statementOperation);
 
   return res.status(201).send();
+});
+
+app.get("/statement/date", verifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const { date } = req.query;
+
+  const dateFormat = new Date(date + " 00:00");
+
+  const statements = customer.statement.filter(
+    (statement) =>
+      statement.created_at.toDateString() ===
+      new Date(dateFormat).toDateString(),
+  );
+
+  return res.json(statements);
 });
 
 app.listen(3333, () => {
