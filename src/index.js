@@ -3,9 +3,9 @@ const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 
-const customers = [];
-
 app.use(express.json());
+
+const customers = [];
 
 // Middleware
 function verifyIfExistsAccountCPF(req, res, next) {
@@ -45,6 +45,22 @@ app.get("/statement/", verifyIfExistsAccountCPF, (req, res) => {
   const { customer } = req;
 
   return res.json(customer.statement);
+});
+
+app.post("/deposit", verifyIfExistsAccountCPF, (req, res) => {
+  const { customer } = req;
+  const { description, amount } = req.body;
+
+  const statementOperation = {
+    description,
+    amount,
+    created_at: new Date(),
+    type: "credit",
+  };
+
+  customer.statement.push(statementOperation);
+
+  return res.status(201).send();
 });
 
 app.listen(3333, () => {
